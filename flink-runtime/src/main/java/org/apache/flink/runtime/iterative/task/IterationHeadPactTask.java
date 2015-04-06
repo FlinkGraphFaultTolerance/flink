@@ -369,8 +369,7 @@ public class IterationHeadPactTask<X, Y, S extends Function, OT> extends
 				}
 
 				Environment env = getEnvironment();
-				
-				// Report end of superstep to JobManager
+
 				TaskConfig taskConfig = new TaskConfig(getTaskConfiguration());
 				JobManagerMessages.ReportIterationWorkerDone workerDoneEvent = new JobManagerMessages.ReportIterationWorkerDone(
 						taskConfig.getIterationId(),

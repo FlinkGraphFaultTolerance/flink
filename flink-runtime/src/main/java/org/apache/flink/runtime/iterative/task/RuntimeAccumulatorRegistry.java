@@ -19,8 +19,9 @@
 package org.apache.flink.runtime.iterative.task;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.flink.api.common.accumulators.Accumulator;
 
@@ -35,8 +36,8 @@ public class RuntimeAccumulatorRegistry {
 	private final Map<String, Accumulator<?, ?>> previousGlobalAccumulator;
 	
 	public RuntimeAccumulatorRegistry() {
-		this.accumulators = new ConcurrentHashMap<String, Accumulator<?,?>>();
-		this.previousGlobalAccumulator = new ConcurrentHashMap<String, Accumulator<?,?>>();
+		this.accumulators = Collections.synchronizedMap(new HashMap<String, Accumulator<?,?>>());
+		this.previousGlobalAccumulator =  Collections.synchronizedMap(new HashMap<String, Accumulator<?,?>>());
 	}
 	
 	@SuppressWarnings("unchecked")

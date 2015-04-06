@@ -432,9 +432,11 @@ class JobManager(val flinkConfiguration: Configuration,
       
     case ReportIterationWorkerDone(iterationId, accumulatorEvent) =>
       try {
-        this.getIterationManager(accumulatorEvent.getJobID(), iterationId)
-          .receiveWorkerDoneEvent(accumulatorEvent.getAccumulators(
-            libraryCacheManager.getClassLoader(accumulatorEvent.getJobID)), sender);
+        // dont work on the same object as the iteration head
+        val accumulatorEventCopy = InstantiationUtil.createCopy(accumulatorEvent);
+        this.getIterationManager(accumulatorEventCopy.getJobID(), iterationId)
+          .receiveWorkerDoneEvent(accumulatorEventCopy.getAccumulators(
+            libraryCacheManager.getClassLoader(accumulatorEventCopy.getJobID)), sender);
       } catch {
         case t: Throwable =>
           log.error(t, "Could not process accumulator event of job {} received from {}.",

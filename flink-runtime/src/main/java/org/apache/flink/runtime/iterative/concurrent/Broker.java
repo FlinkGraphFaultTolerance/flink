@@ -19,17 +19,18 @@
 
 package org.apache.flink.runtime.iterative.concurrent;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * A concurrent data structure that allows the hand-over of an object between a pair of threads
  */
 public class Broker<V> {
 
-	private final ConcurrentMap<String, BlockingQueue<V>> mediations = new ConcurrentHashMap<String, BlockingQueue<V>>();
+	private final Map<String, BlockingQueue<V>> mediations = Collections.synchronizedMap(new HashMap<String, BlockingQueue<V>>());
 
 	/**
 	 * hand in the object to share
@@ -73,11 +74,11 @@ public class Broker<V> {
 	/**
 	 * thread-safe call to get a shared {@link BlockingQueue}
 	 */
-	private BlockingQueue<V> retrieveSharedQueue(String key) {
+	private synchronized BlockingQueue<V> retrieveSharedQueue(String key) {
 		BlockingQueue<V> queue = mediations.get(key);
 		if (queue == null) {
 			queue = new ArrayBlockingQueue<V>(1);
-			BlockingQueue<V> commonQueue = mediations.putIfAbsent(key, queue);
+			BlockingQueue<V> commonQueue = mediations.put(key, queue);
 			return commonQueue != null ? commonQueue : queue;
 		} else {
 			return queue;
